@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOIVO Manager | Premium Business Intelligence</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Scripts for Icons and Charts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">V</div>
+                    <span>VOIVO</span>
+                </div>
+                <button id="refreshBtn" class="icon-btn" title="Refresh Data">
+                    <i data-lucide="refresh-cw" size="14"></i>
+                </button>
+            </div>
+
+            <div class="business-selector-container">
+                <button id="businessSelector" class="business-selector">
+                    <i data-lucide="building-2" size="18"></i>
+                    <div class="business-info">
+                        <span id="currentBusinessName" class="business-name">Loading...</span>
+                        <span class="business-label">Current Business</span>
+                    </div>
+                    <i data-lucide="chevron-down" size="16" id="selectorArrow"></i>
+                </button>
+                
+                <div id="businessDropdown" class="business-dropdown glass" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 50; margin-top: 8px; border-radius: 12px; padding: 8px; border: 1px solid var(--border-active);">
+                    <div id="businessList"></div>
+                    <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
+                    <button id="addBusinessBtn" class="nav-item" style="color: var(--primary);">
+                        <i data-lucide="plus-circle" size="14"></i>
+                        <span>Add New Business</span>
+                    </button>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard" size="20"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="inventory">
+                    <i data-lucide="package" size="20"></i>
+                    <span>Products & Stock</span>
+                </button>
+                <button class="nav-item" data-tab="billing">
+                    <i data-lucide="shopping-cart" size="20"></i>
+                    <span>Billing & POS</span>
+                </button>
+                <button class="nav-item" data-tab="sales">
+                    <i data-lucide="file-text" size="20"></i>
+                    <span>Sales History</span>
+                </button>
+                <button class="nav-item" data-tab="settings">
+                    <i data-lucide="settings" size="20"></i>
+                    <span>System Settings</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="sidebar-footer-item">
+                    <i data-lucide="help-circle" size="18"></i>
+                    <span>Support</span>
+                </button>
+                <button class="sidebar-footer-item danger">
+                    <i data-lucide="log-out" size="18"></i>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <button id="backBtn" class="back-btn" style="display: none;">
+                        <i data-lucide="arrow-left" size="20"></i>
+                    </button>
+                    <h1 id="viewTitle">Dashboard</h1>
+                </div>
+
+                <div class="header-actions">
+                    <div class="notif-container" style="position: relative;">
+                        <button id="notifBtn" class="icon-btn-header">
+                            <i data-lucide="bell" size="20"></i>
+                            <span id="notifDot" class="notification-dot" style="display: none;"></span>
+                        </button>
+                        <div id="notifDropdown" class="glass" style="display: none; position: absolute; top: calc(100% + 20px); right: 0; width: 300px; border-radius: 16px; padding: 20px; border: 1px solid var(--border-active); z-index: 100;">
+                            <h3 style="font-size: 16px; margin-bottom: 16px;">Notifications</h3>
+                            <div id="notifList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                        </div>
+                    </div>
+                    <div class="divider-v"></div>
+                    <div class="user-profile">
+                        <div class="avatar">A</div>
+                    </div>
+                </div>
+            </header>
+            
+            <div id="viewport" class="content-viewport">
+                <!-- Dashboard Tab -->
+                <div id="dashboardView" class="tab-view fade-in"></div>
+                
+                <!-- Inventory Tab -->
+                <div id="inventoryView" class="tab-view fade-in" style="display: none;"></div>
+                
+                <!-- Billing Tab -->
+                <div id="billingView" class="tab-view fade-in" style="display: none;"></div>
+                
+                <!-- Sales Tab -->
+                <div id="salesView" class="tab-view fade-in" style="display: none;"></div>
+                
+                <!-- Settings Tab -->
+                <div id="settingsView" class="tab-view fade-in" style="display: none;">
+                    <div class="glass" style="padding: 60px; border-radius: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                        <i data-lucide="settings" size="48" style="color: var(--text-dim); margin-bottom: 10px;"></i>
+                        <h2>System Settings</h2>
+                        <p style="color: var(--text-dim);">Advanced configuration options will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Setup View -->
+    <div id="setupContainer" class="setup-container">
+        <div class="setup-card glass">
+            <div class="setup-header">
+                <div class="logo-icon large">V</div>
+                <h1>Welcome to VOIVO Manager</h1>
+                <p>Let's set up your first business to get started.</p>
+            </div>
+            
+            <form id="setupForm" class="setup-form" style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="form-group">
+                    <label><i data-lucide="building-2" size="14"></i> Business Name</label>
+                    <input type="text" id="setupName" required placeholder="e.g. VOIVO Lubricants Pvt Ltd">
+                </div>
+                <div class="form-group">
+                    <label><i data-lucide="check-circle-2" size="14"></i> GST Number (Optional)</label>
+                    <input type="text" id="setupGst" placeholder="e.g. 27AAAAA0000A1Z5">
+                </div>
+                <div class="form-group">
+                    <label><i data-lucide="phone" size="14"></i> Contact Phone</label>
+                    <input type="text" id="setupPhone" placeholder="Phone Number">
+                </div>
+                <div class="form-group">
+                    <label><i data-lucide="map-pin" size="14"></i> Business Address</label>
+                    <textarea id="setupAddress" placeholder="Full office/warehouse address" style="height: 80px; resize: none;"></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 12px; height: 56px;">
+                    Create Business & Start
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div id="modalContent" class="modal-card glass"></div>
+    </div>
+
+    <!-- Invoice View -->
+    <div id="invoiceOverlay" class="invoice-clone-overlay no-print-bg">
+        <div class="invoice-clone-container print-area">
+            <div class="invoice-clone-controls no-print">
+                <button id="printBtn" class="control-btn" title="Print Invoice"><i data-lucide="printer" size="20"></i></button>
+                <button id="closeInvoiceBtn" class="control-btn" title="Close"><i data-lucide="x" size="20"></i></button>
+            </div>
+            <div id="invoicePaper" class="invoice-paper"></div>
+        </div>
+    </div>
+
+    <!-- Toast System -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
